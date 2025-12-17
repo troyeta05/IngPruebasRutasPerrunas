@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "150886566606",
+    "project_id": "rutas-perrunas-d85a6",
+    "storage_bucket": "rutas-perrunas-d85a6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:150886566606:android:9540821a1061a3208d9e9f",
+        "android_client_info": {
+          "package_name": "com.tzilacatzin.rutasperrunas"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBF0fvyZL5SflTEyRit74QsTKwPhl_1M1s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
