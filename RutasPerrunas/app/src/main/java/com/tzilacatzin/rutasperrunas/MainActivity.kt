@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            //Navegar a home
+
         }
     }
 }

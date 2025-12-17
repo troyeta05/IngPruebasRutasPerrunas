@@ -40,8 +40,6 @@ import com.tzilacatzin.rutasperrunas.ui.theme.Negro
 import com.tzilacatzin.rutasperrunas.ui.theme.VerdeOscuro
 import kotlinx.coroutines.launch
 
-// <<< 1. Importar las funciones necesarias
-// <<< 2. Actualizar la firma para recibir navController y db
 @Composable
 fun LoginScreen(
     auth: FirebaseAuth,
@@ -54,7 +52,6 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // <<< 3. Crear un CoroutineScope
     val scope = rememberCoroutineScope()
 
     var showErrorDialog by remember { mutableStateOf<String?>(null) }
@@ -124,12 +121,10 @@ fun LoginScreen(
                     if (email.isBlank() || password.isBlank()) {
                         showEmptyFieldsDialog = true
                     } else {
-                        // <<< 4. Implementar la lógica de navegación por rol
                         auth.signInWithEmailAndPassword(email, password)
                             .addOnSuccessListener { authResult ->
                                 val uid = authResult.user?.uid
                                 if (uid != null) {
-                                    // Lanzar una coroutine para buscar en la base de datos
                                     scope.launch {
                                         val usuario = buscarUsuarioEnFirestore(uid = uid, db = db)
                                         if (usuario != null) {
@@ -143,25 +138,21 @@ fun LoginScreen(
                                                 }
 
                                                 else -> {
-                                                    // Rol desconocido, mostrar error
                                                     showErrorDialog =
                                                         "Rol de usuario no reconocido."
                                                 }
                                             }
                                         } else {
-                                            // No se encontraron datos para este usuario
                                             showErrorDialog =
                                                 "No se encontró un perfil para este usuario."
                                         }
                                     }
                                 } else {
-                                    // Error muy raro, el UID es nulo
                                     showErrorDialog =
                                         "Ocurrió un error inesperado al iniciar sesión."
                                 }
                             }
                             .addOnFailureListener {
-                                // Credenciales incorrectas
                                 showErrorDialog =
                                     "El correo electrónico o la contraseña son incorrectos."
                             }
@@ -188,7 +179,6 @@ fun LoginScreen(
         }
     }
 
-    // Diálogo para errores genéricos
     showErrorDialog?.let { message ->
         AlertDialog(
             onDismissRequest = { showErrorDialog = null },
@@ -205,7 +195,6 @@ fun LoginScreen(
         )
     }
 
-    // Diálogo para campos vacíos
     if (showEmptyFieldsDialog) {
         AlertDialog(
             onDismissRequest = { showEmptyFieldsDialog = false },

@@ -3,16 +3,18 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.tzilacatzin.rutasperrunas.model.Paseo
+import com.tzilacatzin.rutasperrunas.screen.homedueño.Mascota
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class AgregarMascotaViewModel : ViewModel() {
     private val auth = Firebase.auth
     private val firestore = Firebase.firestore
 
-    // --- Estados del formulario ---
     private val _nombre = MutableStateFlow("")
     val nombre = _nombre.asStateFlow()
 
@@ -25,7 +27,6 @@ class AgregarMascotaViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-    // --- Eventos de la UI ---
     fun onNombreChange(nombre: String) {
         _nombre.value = nombre
     }
@@ -33,22 +34,18 @@ class AgregarMascotaViewModel : ViewModel() {
     fun onRazaChange(raza: String) {
         _raza.value = raza
     }
-
     fun onEdadChange(edad: String) {
-        // Permitir solo números en el campo de edad
         if (edad.all { it.isDigit() }) {
             _edad.value = edad
         }
     }
 
-    // --- Validación del formulario (sin imagen) ---
     fun esFormularioValido(): Boolean {
         return _nombre.value.isNotBlank() &&
                 _raza.value.isNotBlank() &&
                 _edad.value.isNotBlank()
     }
 
-    // --- Lógica de negocio (sin imagen) ---
     fun agregarMascota(onSuccess: () -> Unit, onError: (String) -> Unit) {
         if (!esFormularioValido()) {
             onError("Todos los campos son obligatorios.")
@@ -66,7 +63,6 @@ class AgregarMascotaViewModel : ViewModel() {
             }
 
             try {
-                // Guardar los datos de la mascota en Firestore (sin URL de imagen)
                 val mascotaData = hashMapOf(
                     "nombre" to _nombre.value,
                     "raza" to _raza.value,
@@ -78,7 +74,7 @@ class AgregarMascotaViewModel : ViewModel() {
                     .add(mascotaData)
                     .await()
 
-                onSuccess() // Llama al callback de éxito
+                onSuccess()
 
             } catch (e: Exception) {
                 onError(e.message ?: "Ocurrió un error desconocido.")

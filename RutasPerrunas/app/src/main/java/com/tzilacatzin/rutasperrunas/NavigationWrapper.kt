@@ -1,13 +1,14 @@
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tzilacatzin.rutasperrunas.screen.homedueño.HomeDueñoScreen
-import com.tzilacatzin.rutasperrunas.screen.homepaseador.HomePaseadorScreen
+import com.tzilacatzin.rutasperrunas.screen.MapaPaseoScreen
 
-// Importaciones de las pantallas que necesitas
 @Composable
 fun NavigationWrapper(
     navHostController: NavHostController,
@@ -16,32 +17,27 @@ fun NavigationWrapper(
 ) {
     NavHost(navController = navHostController, startDestination = "login") {
         composable("login") {
-            // Pasando las dependencias y callbacks de navegación necesarios
             LoginScreen(
                 auth = auth,
                 db = db,
                 navController = navHostController,
-                // Usar las mismas claves de ruta definidas en las composable()
                 NavigateToSingup = { navHostController.navigate("singup") },
                 NavigateToHomeDueño = { navHostController.navigate("homeDueño") },
                 NavigateToHomePaseador = { navHostController.navigate("homePaseador") }
             )
         }
         composable("singup") {
-            // Pasando las dependencias y el callback de navegación
             SingupScreen(
                 auth = auth,
                 db = db,
                 NavigateToLogin = {
                     navHostController.navigate("login") {
-                        // Limpia el backstack hasta 'login' para que el usuario no pueda volver a 'singup'
                         popUpTo("login") { inclusive = true }
                     }
                 }
             )
         }
         composable("homeDueño") {
-            // HomeDueñoScreen no necesita props porque usa un ViewModel interno para obtener los datos
             HomeDueñoScreen(
                 auth = auth,
                 NavigationToLogin = { navHostController.navigate("login") },
@@ -50,14 +46,37 @@ fun NavigationWrapper(
         }
         composable("agregarMascota") {
             AgregarMascotaScreen(
-                // La acción del botón "Regresar" te lleva a la pantalla anterior
                 onNavigateBack = {
                     navHostController.popBackStack()
                 }
             )
         }
         composable("homePaseador") {
-            HomePaseadorScreen()
+            HomePaseadorScreen(
+                auth = auth,
+                NavigationToLogin = {
+                    navHostController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                },
+                onNavegarAlMapa = { paseoId ->
+                    navHostController.navigate("mapaPaseo/$paseoId")
+                }
+            )
+        }
+
+        composable(
+            route = "mapaPaseo/{paseoId}",
+            arguments = listOf(navArgument("paseoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val paseoId = backStackEntry.arguments?.getString("paseoId") ?: ""
+            MapaPaseoScreen(
+                paseoId = paseoId,
+                onPaseoFinalizado = {
+                    navHostController.popBackStack()
+                }
+            )
         }
     }
+
 }

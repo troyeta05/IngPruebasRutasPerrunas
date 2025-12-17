@@ -52,7 +52,6 @@ fun SingupScreen(auth: FirebaseAuth, db: FirebaseFirestore, NavigateToLogin: () 
     val radioOptions = listOf("Dueño", "Paseador")
     var selectedOption by remember { mutableStateOf(radioOptions[0]) }
 
-    // <<< 1. Añadir un CoroutineScope
     val scope = rememberCoroutineScope()
 
     var showEmptyFieldsDialog by remember { mutableStateOf(false) }
@@ -199,16 +198,13 @@ fun SingupScreen(auth: FirebaseAuth, db: FirebaseFirestore, NavigateToLogin: () 
                 Button(
                     onClick = {
                         showConfirmationDialog = false
-                        // <<< 2. Lanzar una coroutine para manejar las operaciones asíncronas
                         scope.launch {
                             try {
-                                // Primero, intenta crear el usuario en Authentication
                                 val authResult =
                                     auth.createUserWithEmailAndPassword(email, password).await()
                                 val uid = authResult.user?.uid
 
                                 if (uid != null) {
-                                    // Si tiene éxito, intenta guardar los datos en Firestore
                                     val guardadoExitoso = guardarDatosUsuarioEnFirestore(
                                         uid,
                                         email,
@@ -216,10 +212,8 @@ fun SingupScreen(auth: FirebaseAuth, db: FirebaseFirestore, NavigateToLogin: () 
                                         db
                                     )
                                     if (guardadoExitoso) {
-                                        // Si todo sale bien, muestra el diálogo de éxito
                                         showSuccessDialog = true
                                     } else {
-                                        // Si falla el guardado en Firestore, muestra error
                                         showErrorDialog =
                                             "No se pudo guardar la información del usuario."
                                     }
@@ -228,7 +222,6 @@ fun SingupScreen(auth: FirebaseAuth, db: FirebaseFirestore, NavigateToLogin: () 
                                         "Ocurrió un error inesperado al obtener el identificador."
                                 }
                             } catch (exception: Exception) {
-                                // Si CUALQUIER .await() falla (autenticación o guardado), se captura aquí
                                 showErrorDialog =
                                     exception.message ?: "Ocurrió un error durante el registro."
                             }
